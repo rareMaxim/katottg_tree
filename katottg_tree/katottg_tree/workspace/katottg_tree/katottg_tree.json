@@ -1,0 +1,56 @@
+{
+ "app": "katottg_tree",
+ "charts": [],
+ "content": "[{\"id\":\"CoHLG8nMqP\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Katottg Tree</span>\",\"col\":12}},{\"id\":\"Q5hui7yvhH\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"\u0414\u043e\u0432\u0456\u0434\u043d\u0438\u043a \u041a\u0410\u0422\u041e\u0422\u0422\u0413\",\"col\":3}},{\"id\":\"1GZxrQ0EAW\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"\u0406\u043c\u043f\u043e\u0440\u0442 \u0434\u0430\u043d\u043d\u0438\u0445\",\"col\":3}},{\"id\":\"6YiDAL1yja\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"\u0422\u0435\u0441\u0442\",\"col\":3}}]",
+ "creation": "2025-09-05 11:37:17.111334",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "map",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Katottg Tree",
+ "link_type": "DocType",
+ "links": [],
+ "modified": "2025-09-05 11:41:00.006654",
+ "modified_by": "Administrator",
+ "module": "Katottg Tree",
+ "name": "Katottg Tree",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 44.0,
+ "shortcuts": [
+  {
+   "color": "Blue",
+   "doc_view": "Tree",
+   "label": "\u0414\u043e\u0432\u0456\u0434\u043d\u0438\u043a \u041a\u0410\u0422\u041e\u0422\u0422\u0413",
+   "link_to": "KATOTTG",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "\u0406\u043c\u043f\u043e\u0440\u0442 \u0434\u0430\u043d\u043d\u0438\u0445",
+   "link_to": "KATOTTG Import Settings",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "\u0422\u0435\u0441\u0442",
+   "link_to": "KATOTTG Test Control",
+   "stats_filter": "[]",
+   "type": "DocType"
+  }
+ ],
+ "title": "Katottg Tree",
+ "type": "Workspace"
+}

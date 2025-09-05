@@ -27,6 +27,7 @@ app_license = "mit"
 # include js, css files in header of desk.html
 # app_include_css = "/assets/katottg_tree/css/katottg_tree.css"
 # app_include_js = "/assets/katottg_tree/js/katottg_tree.js"
+app_include_js = "/assets/katottg_tree/js/katottg_link_control.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/katottg_tree/css/katottg_tree.css"
@@ -231,9 +232,8 @@ app_license = "mit"
 # ]
 
 # Automatically update python controller files with type annotations for this app.
-# export_python_type_annotations = True
+export_python_type_annotations = True
 
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
-
