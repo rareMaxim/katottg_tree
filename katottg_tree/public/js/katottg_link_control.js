@@ -76,11 +76,23 @@ const CustomControlLink = class extends OriginalControlLink {
 					fieldtype: "Link",
 					options: "KATOTTG",
 				},
+				// Нове поле для району міста
+				{
+					label: "Район міста",
+					fieldname: "level_5",
+					fieldtype: "Link",
+					options: "KATOTTG",
+				},
 			],
 			primary_action_label: __("Зберегти"),
 			primary_action: (values) => {
+				// Оновлена логіка збереження
 				const final_value =
-					values.level_4 || values.level_3 || values.level_2 || values.level_1;
+					values.level_5 ||
+					values.level_4 ||
+					values.level_3 ||
+					values.level_2 ||
+					values.level_1;
 				control.set_value(final_value).then(() => {
 					control.refresh();
 				});
@@ -100,7 +112,11 @@ const CustomControlLink = class extends OriginalControlLink {
 				filters: { is_group: 1, parent_katottg: dialog.get_value("level_2") },
 			});
 			dialog.get_field("level_4").get_query = () => ({
-				filters: { parent_katottg: dialog.get_value("level_3") },
+				filters: { is_group: 1, parent_katottg: dialog.get_value("level_3") },
+			});
+			// Новий фільтр для району міста
+			dialog.get_field("level_5").get_query = () => ({
+				filters: { parent_katottg: dialog.get_value("level_4"), category: "B" }, // Категорія "B" для районів у місті
 			});
 
 			// Очищення дочірніх полів при зміні батьківського
@@ -108,13 +124,19 @@ const CustomControlLink = class extends OriginalControlLink {
 				dialog.set_value("level_2", "");
 				dialog.set_value("level_3", "");
 				dialog.set_value("level_4", "");
+				dialog.set_value("level_5", "");
 			};
 			dialog.fields_dict.level_2.df.onchange = () => {
 				dialog.set_value("level_3", "");
 				dialog.set_value("level_4", "");
+				dialog.set_value("level_5", "");
 			};
 			dialog.fields_dict.level_3.df.onchange = () => {
 				dialog.set_value("level_4", "");
+				dialog.set_value("level_5", "");
+			};
+			dialog.fields_dict.level_4.df.onchange = () => {
+				dialog.set_value("level_5", "");
 			};
 		};
 
@@ -125,6 +147,7 @@ const CustomControlLink = class extends OriginalControlLink {
 			if (hierarchy[1]) dialog.set_value("level_2", hierarchy[1]);
 			if (hierarchy[2]) dialog.set_value("level_3", hierarchy[2]);
 			if (hierarchy[3]) dialog.set_value("level_4", hierarchy[3]);
+			if (hierarchy[4]) dialog.set_value("level_5", hierarchy[4]);
 		};
 
 		setup_filters_and_queries();
