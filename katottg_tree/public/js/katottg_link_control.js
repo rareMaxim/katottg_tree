@@ -112,7 +112,7 @@ const CustomControlLink = class extends OriginalControlLink {
 				filters: { is_group: 1, parent_katottg: dialog.get_value("level_2") },
 			});
 			dialog.get_field("level_4").get_query = () => ({
-				filters: { is_group: 1, parent_katottg: dialog.get_value("level_3") },
+				filters: { parent_katottg: dialog.get_value("level_3") },
 			});
 			// Новий фільтр для району міста
 			dialog.get_field("level_5").get_query = () => ({
