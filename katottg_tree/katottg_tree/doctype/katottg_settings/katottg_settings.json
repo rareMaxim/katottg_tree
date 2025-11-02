@@ -1,0 +1,136 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-11-02 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "default_katottg_section",
+  "default_katottg",
+  "enable_caching",
+  "cache_ttl",
+  "column_break_cache",
+  "clear_cache_button",
+  "import_settings_section",
+  "excel_column_mapping",
+  "column_break_import",
+  "import_batch_size",
+  "enable_import_validation",
+  "search_settings_section",
+  "enable_fuzzy_search",
+  "search_results_limit"
+ ],
+ "fields": [
+  {
+   "fieldname": "default_katottg_section",
+   "fieldtype": "Section Break",
+   "label": "Налаштування за замовчуванням"
+  },
+  {
+   "fieldname": "default_katottg",
+   "fieldtype": "Link",
+   "label": "Об'єкт КАТОТТГ за замовчуванням",
+   "options": "KATOTTG",
+   "description": "Значення, яке буде використовуватись за замовчуванням при виборі КАТОТТГ"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_caching",
+   "fieldtype": "Check",
+   "label": "Увімкнути кешування"
+  },
+  {
+   "default": "3600",
+   "depends_on": "eval:doc.enable_caching",
+   "fieldname": "cache_ttl",
+   "fieldtype": "Int",
+   "label": "Час життя кешу (секунди)",
+   "description": "Скільки секунд зберігати дані в кеші"
+  },
+  {
+   "fieldname": "column_break_cache",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.enable_caching",
+   "fieldname": "clear_cache_button",
+   "fieldtype": "Button",
+   "label": "Очистити кеш КАТОТТГ"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "import_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Налаштування імпорту"
+  },
+  {
+   "fieldname": "excel_column_mapping",
+   "fieldtype": "Code",
+   "label": "Мапінг стовпців Excel (JSON)",
+   "options": "JSON",
+   "description": "JSON конфігурація для мапінгу стовпців Excel файлу",
+   "default": "{\n  \"level_1\": 0,\n  \"level_2\": 1,\n  \"level_3\": 2,\n  \"level_4\": 3,\n  \"level_5\": 4,\n  \"category\": 5,\n  \"title\": 6\n}"
+  },
+  {
+   "fieldname": "column_break_import",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "500",
+   "fieldname": "import_batch_size",
+   "fieldtype": "Int",
+   "label": "Розмір пакету імпорту",
+   "description": "Кількість записів для вставки за один раз"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_import_validation",
+   "fieldtype": "Check",
+   "label": "Увімкнути валідацію при імпорті"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "search_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Налаштування пошуку"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_fuzzy_search",
+   "fieldtype": "Check",
+   "label": "Увімкнути нечіткий пошук"
+  },
+  {
+   "default": "50",
+   "fieldname": "search_results_limit",
+   "fieldtype": "Int",
+   "label": "Максимальна кількість результатів пошуку"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2025-11-02 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Katottg Tree",
+ "name": "KATOTTG Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

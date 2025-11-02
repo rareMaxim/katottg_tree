@@ -1,3 +1,4 @@
+import json
 import os
 import uuid
 
@@ -9,29 +10,44 @@ from openpyxl import load_workbook
 @frappe.whitelist()
 def enqueue_import():
 	"""Створює фонове завдання для імпорту та повертає його ID."""
-	settings = frappe.get_single("KATOTTG Import Settings")
-	file_url = settings.data_file
-	if not file_url:
-		frappe.throw(_("Будь ласка, завантажте файл кодифікатора."))
+	try:
+		settings = frappe.get_single("KATOTTG Import Settings")
+		file_url = settings.data_file
+		if not file_url:
+			frappe.throw(_("Будь ласка, завантажте файл кодифікатора."))
 
-	if file_url.startswith("/private"):
-		file_path = frappe.get_site_path("private", "files", file_url.split("/private/files/")[-1])
-	else:
-		file_path = frappe.get_site_path("public", "files", file_url.split("/files/")[-1])
+		# Визначаємо шлях до файлу
+		if file_url.startswith("/private"):
+			file_path = frappe.get_site_path("private", "files", file_url.split("/private/files/")[-1])
+		else:
+			file_path = frappe.get_site_path("public", "files", file_url.split("/files/")[-1])
 
-	if not os.path.exists(file_path):
-		frappe.throw(_("Файл не знайдено за шляхом: {0}").format(file_path))
-	tracking_id = str(uuid.uuid4())
-	frappe.enqueue(
-		background_importer,
-		queue="long",
-		timeout=2500,
-		# enqueue_after_commit=True,
-		file_path=file_path,
-		site=frappe.local.site,
-		tracking_id=tracking_id,
-	)
-	return tracking_id
+		# Перевірка існування файлу
+		if not os.path.exists(file_path):
+			frappe.throw(_("Файл не знайдено за шляхом: {0}").format(file_path))
+
+		# Перевірка формату файлу
+		if not file_path.endswith((".xlsx", ".xls")):
+			frappe.throw(_("Підтримуються тільки файли Excel (.xlsx або .xls)"))
+
+		# Логування початку імпорту
+		frappe.logger().info(f"Початок імпорту КАТОТТГ з файлу: {file_path}")
+
+		tracking_id = str(uuid.uuid4())
+		frappe.enqueue(
+			background_importer,
+			queue="long",
+			timeout=2500,
+			file_path=file_path,
+			site=frappe.local.site,
+			tracking_id=tracking_id,
+		)
+
+		return tracking_id
+
+	except Exception as e:
+		frappe.log_error(frappe.get_traceback(), "KATOTTG Import Enqueue Error")
+		frappe.throw(_("Помилка при запуску імпорту: {0}").format(str(e)))
 
 
 def background_importer(file_path, site, tracking_id):
