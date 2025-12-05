@@ -24,6 +24,8 @@ class KATOTTG(NestedSet):
 		old_parent: DF.Link | None
 		parent_katottg: DF.Link | None
 		rgt: DF.Int
+		territory_marker: DF.Link | None
+		territory_marker_date: DF.Date | None
 		title: DF.Data
 	# end: auto-generated types
 
@@ -139,7 +141,7 @@ def get_katottg_children(parent=None, is_root=False):
 		return frappe.get_all(
 			"KATOTTG",
 			filters=filters,
-			fields=["name", "code", "title", "category", "is_group", "parent_katottg"],
+			fields=["name", "code", "title", "category", "is_group", "parent_katottg", "territory_marker", "territory_marker_date"],
 			order_by="code asc",
 		)
 	except Exception:

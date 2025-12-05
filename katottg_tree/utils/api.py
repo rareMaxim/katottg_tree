@@ -194,7 +194,7 @@ def search_katottg(query, filters=None, limit=50):
 				"KATOTTG",
 				filters=search_filters,
 				or_filters=or_filters,
-				fields=["name", "code", "title", "category", "parent_katottg", "is_group"],
+				fields=["name", "code", "title", "category", "parent_katottg", "is_group", "territory_marker", "territory_marker_date"],
 				limit=limit,
 				order_by="code asc",
 			)
@@ -240,7 +240,7 @@ def _fuzzy_search(query, base_filters, limit):
 			["code", "=", query],
 			["title", "=", query],
 		],
-		fields=["name", "code", "title", "category", "parent_katottg", "is_group"],
+		fields=["name", "code", "title", "category", "parent_katottg", "is_group", "territory_marker", "territory_marker_date"],
 		limit=limit,
 	)
 
@@ -259,7 +259,7 @@ def _fuzzy_search(query, base_filters, limit):
 				["code", "like", f"{query}%"],
 				["title", "like", f"{query}%"],
 			],
-			fields=["name", "code", "title", "category", "parent_katottg", "is_group"],
+			fields=["name", "code", "title", "category", "parent_katottg", "is_group", "territory_marker", "territory_marker_date"],
 			limit=limit * 2,
 		)
 
@@ -278,7 +278,7 @@ def _fuzzy_search(query, base_filters, limit):
 				["code", "like", f"%{query}%"],
 				["title", "like", f"%{query}%"],
 			],
-			fields=["name", "code", "title", "category", "parent_katottg", "is_group"],
+			fields=["name", "code", "title", "category", "parent_katottg", "is_group", "territory_marker", "territory_marker_date"],
 			limit=limit * 2,
 		)
 
@@ -306,7 +306,7 @@ def _fuzzy_search(query, base_filters, limit):
 					"KATOTTG",
 					filters=base_filters,
 					or_filters=word_filters,
-					fields=["name", "code", "title", "category", "parent_katottg", "is_group"],
+					fields=["name", "code", "title", "category", "parent_katottg", "is_group", "territory_marker", "territory_marker_date"],
 					limit=limit * 2,
 				)
 
@@ -350,12 +350,300 @@ def get_katottg_by_category(category, parent=None, limit=100):
 		return frappe.get_all(
 			"KATOTTG",
 			filters=filters,
-			fields=["name", "code", "title", "category", "parent_katottg", "is_group"],
+			fields=["name", "code", "title", "category", "parent_katottg", "is_group", "territory_marker", "territory_marker_date"],
 			limit=limit,
 			order_by="title asc",
 		)
 	except Exception:
 		frappe.log_error(frappe.get_traceback(), "KATOTTG By Category Error")
+		return []
+
+
+@frappe.whitelist()
+def get_katottg_by_territory_marker(territory_marker, parent=None, limit=100):
+	"""
+	Отримати список об'єктів КАТОТТГ по позначці території.
+
+	Args:
+	    territory_marker: Позначка території (назва з KATOTTG Territory Marker)
+	    parent: Батьківський об'єкт (опціонально)
+	    limit: Максимальна кількість результатів
+
+	Returns:
+	    Список об'єктів КАТОТТГ з вказаною позначкою
+	"""
+	if not territory_marker:
+		return []
+
+	filters = {"territory_marker": territory_marker}
+	if parent:
+		filters["parent_katottg"] = parent
+
+	try:
+		results = frappe.get_all(
+			"KATOTTG",
+			filters=filters,
+			fields=["name", "code", "title", "category", "parent_katottg", "is_group", "territory_marker", "territory_marker_date"],
+			limit=limit,
+			order_by="title asc",
+		)
+
+		# Додаємо повний шлях для кожного результату
+		for result in results:
+			result["full_path"] = get_katottg_full_path(result["name"])
+
+		return results
+	except Exception:
+		frappe.log_error(frappe.get_traceback(), "KATOTTG By Territory Marker Error")
+		return []
+
+
+@frappe.whitelist()
+def get_katottg_with_markers(limit=500):
+	"""
+	Отримати всі об'єкти КАТОТТГ, які мають позначку території.
+
+	Args:
+	    limit: Максимальна кількість результатів
+
+	Returns:
+	    Список об'єктів КАТОТТГ з позначками
+	"""
+	try:
+		results = frappe.get_all(
+			"KATOTTG",
+			filters=[["territory_marker", "is", "set"]],
+			fields=["name", "code", "title", "category", "parent_katottg", "is_group", "territory_marker", "territory_marker_date"],
+			limit=limit,
+			order_by="code asc",
+		)
+
+		# Додаємо повний шлях для кожного результату
+		for result in results:
+			result["full_path"] = get_katottg_full_path(result["name"])
+
+		return results
+	except Exception:
+		frappe.log_error(frappe.get_traceback(), "KATOTTG With Markers Error")
+		return []
+
+
+@frappe.whitelist()
+def set_territory_marker(katottg_name, territory_marker, territory_marker_date=None):
+	"""
+	Встановити позначку території для конкретного об'єкта КАТОТТГ.
+
+	Args:
+	    katottg_name: Код КАТОТТГ
+	    territory_marker: Назва позначки території (з KATOTTG Territory Marker)
+	    territory_marker_date: Дата набрання чинності (опціонально)
+
+	Returns:
+	    Оновлений документ КАТОТТГ
+	"""
+	if not katottg_name:
+		frappe.throw(_("Код КАТОТТГ є обов'язковим"))
+
+	try:
+		doc = frappe.get_doc("KATOTTG", katottg_name)
+		doc.territory_marker = territory_marker
+		doc.territory_marker_date = territory_marker_date
+		doc.save(ignore_permissions=True)
+		frappe.db.commit()
+
+		return {
+			"success": True,
+			"name": doc.name,
+			"territory_marker": doc.territory_marker,
+			"territory_marker_date": doc.territory_marker_date,
+		}
+	except frappe.DoesNotExistError:
+		frappe.throw(_("Об'єкт КАТОТТГ не знайдено: {0}").format(katottg_name))
+	except Exception as e:
+		frappe.log_error(frappe.get_traceback(), "KATOTTG Set Territory Marker Error")
+		frappe.throw(_("Помилка при встановленні позначки: {0}").format(str(e)))
+
+
+@frappe.whitelist()
+def set_territory_marker_bulk(katottg_codes, territory_marker, territory_marker_date=None, include_children=False):
+	"""
+	Масове встановлення позначки території для кількох об'єктів КАТОТТГ.
+
+	Args:
+	    katottg_codes: Список кодів КАТОТТГ (JSON string або list)
+	    territory_marker: Назва позначки території
+	    territory_marker_date: Дата набрання чинності (опціонально)
+	    include_children: Чи включати дочірні елементи
+
+	Returns:
+	    Результат операції з кількістю оновлених записів
+	"""
+	import json
+
+	if isinstance(katottg_codes, str):
+		katottg_codes = json.loads(katottg_codes)
+
+	if not katottg_codes:
+		return {"success": False, "message": _("Список кодів КАТОТТГ порожній"), "updated": 0}
+
+	updated_count = 0
+	errors = []
+
+	try:
+		all_codes = set(katottg_codes)
+
+		# Якщо включаємо дочірні елементи
+		if include_children:
+			for code in katottg_codes:
+				try:
+					children = frappe.get_all(
+						"KATOTTG",
+						filters={"parent_katottg": code},
+						fields=["name"],
+						limit=10000,
+					)
+					all_codes.update([c.name for c in children])
+
+					# Рекурсивно отримуємо всіх нащадків
+					def get_descendants(parent_code):
+						descendants = frappe.get_all(
+							"KATOTTG",
+							filters={"parent_katottg": parent_code},
+							fields=["name"],
+							limit=10000,
+						)
+						for desc in descendants:
+							all_codes.add(desc.name)
+							get_descendants(desc.name)
+
+					get_descendants(code)
+				except Exception:
+					pass
+
+		# Оновлюємо записи пакетами
+		batch_size = 100
+		all_codes_list = list(all_codes)
+
+		for i in range(0, len(all_codes_list), batch_size):
+			batch = all_codes_list[i : i + batch_size]
+
+			try:
+				frappe.db.sql(
+					"""
+					UPDATE `tabKATOTTG`
+					SET territory_marker = %s,
+					    territory_marker_date = %s,
+					    modified = NOW()
+					WHERE name IN %s
+				""",
+					(territory_marker, territory_marker_date, tuple(batch)),
+				)
+				updated_count += len(batch)
+			except Exception as e:
+				errors.append(str(e))
+
+		frappe.db.commit()
+
+		# Очищаємо кеш
+		from katottg_tree.katottg_tree.doctype.katottg_settings.katottg_settings import (
+			clear_katottg_cache,
+		)
+
+		clear_katottg_cache()
+
+		return {
+			"success": True,
+			"message": _("Успішно оновлено {0} записів").format(updated_count),
+			"updated": updated_count,
+			"errors": errors if errors else None,
+		}
+
+	except Exception as e:
+		frappe.db.rollback()
+		frappe.log_error(frappe.get_traceback(), "KATOTTG Bulk Set Territory Marker Error")
+		return {
+			"success": False,
+			"message": _("Помилка при масовому оновленні: {0}").format(str(e)),
+			"updated": updated_count,
+		}
+
+
+@frappe.whitelist()
+def clear_territory_marker(katottg_name):
+	"""
+	Видалити позначку території з конкретного об'єкта КАТОТТГ.
+
+	Args:
+	    katottg_name: Код КАТОТТГ
+
+	Returns:
+	    Результат операції
+	"""
+	if not katottg_name:
+		frappe.throw(_("Код КАТОТТГ є обов'язковим"))
+
+	try:
+		doc = frappe.get_doc("KATOTTG", katottg_name)
+		doc.territory_marker = None
+		doc.territory_marker_date = None
+		doc.save(ignore_permissions=True)
+		frappe.db.commit()
+
+		return {
+			"success": True,
+			"name": doc.name,
+			"message": _("Позначку успішно видалено"),
+		}
+	except frappe.DoesNotExistError:
+		frappe.throw(_("Об'єкт КАТОТТГ не знайдено: {0}").format(katottg_name))
+	except Exception as e:
+		frappe.log_error(frappe.get_traceback(), "KATOTTG Clear Territory Marker Error")
+		frappe.throw(_("Помилка при видаленні позначки: {0}").format(str(e)))
+
+
+@frappe.whitelist()
+def get_territory_marker_statistics():
+	"""
+	Отримати статистику по позначках територій.
+
+	Returns:
+	    Словник зі статистикою по кожному типу позначки
+	"""
+	try:
+		# Отримуємо всі типи позначок
+		markers = frappe.get_all(
+			"KATOTTG Territory Marker",
+			fields=["name", "title", "marker_code", "color"],
+		)
+
+		stats = []
+		for marker in markers:
+			count = frappe.db.count("KATOTTG", {"territory_marker": marker.name})
+			stats.append(
+				{
+					"marker": marker.name,
+					"title": marker.title,
+					"marker_code": marker.marker_code,
+					"color": marker.color,
+					"count": count,
+				}
+			)
+
+		# Додаємо кількість без позначки
+		no_marker_count = frappe.db.count("KATOTTG", {"territory_marker": ["is", "not set"]})
+		stats.append(
+			{
+				"marker": None,
+				"title": _("Без позначки"),
+				"marker_code": None,
+				"color": None,
+				"count": no_marker_count,
+			}
+		)
+
+		return stats
+	except Exception:
+		frappe.log_error(frappe.get_traceback(), "KATOTTG Territory Marker Statistics Error")
 		return []
 
 

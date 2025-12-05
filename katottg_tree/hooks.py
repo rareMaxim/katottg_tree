@@ -83,6 +83,16 @@ app_include_js = "/assets/katottg_tree/js/katottg_link_control.js"
 # 	"filters": "katottg_tree.utils.jinja_filters"
 # }
 
+# Fixtures
+# ---------
+# Fixtures are automatically exported and imported during app installation
+fixtures = [
+	{
+		"doctype": "KATOTTG Territory Marker",
+		"filters": []
+	}
+]
+
 # Installation
 # ------------
 
