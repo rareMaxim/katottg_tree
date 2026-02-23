@@ -1,0 +1,22 @@
+{
+ "app": "katottg_tree",
+ "bg_color": "gray",
+ "creation": "2026-02-19 23:16:54.430411",
+ "docstatus": 0,
+ "doctype": "Desktop Icon",
+ "hidden": 0,
+ "icon": "map",
+ "icon_type": "Link",
+ "idx": 0,
+ "label": "Katottg Tree",
+ "link_to": "Katottg Tree",
+ "link_type": "Workspace Sidebar",
+ "modified": "2026-02-20 12:23:20.099872",
+ "modified_by": "Administrator",
+ "name": "Katottg Tree",
+ "owner": "Administrator",
+ "restrict_removal": 0,
+ "roles": [],
+ "sidebar": "Katottg Tree",
+ "standard": 1
+}
